@@ -1,0 +1,23 @@
+/* RiaSans-ExtraBold */
+@font-face {
+  font-family: 'RiaSans-ExtraBold';
+  src: url('../assets/fonts/RiaSans-ExtraBold.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'PretendardVariable';
+  src: url('../assets/fonts/PretendardVariable.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+@font-face {
+  font-family: 'PretendardVariable';
+  src: url('../assets/fonts/PretendardVariable.woff2') format('woff2');
+  font-weight: bold;
+  font-style: normal;
+}
+

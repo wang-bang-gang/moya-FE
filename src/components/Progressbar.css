@@ -1,0 +1,22 @@
+.progress-bar {
+  position: absolute;   /* 화면 위에 고정 */
+  top: 20px;            /* 위에서 20px */
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: 8px;
+  padding: 0 24px;
+  z-index: 2;           /* 배경 오버레이(::before, z-index:0) 위로 */
+  background: none;     /* 전체 까만 박스 안 나오게 */
+}
+
+.step {
+  flex: 1;
+  height: 5px;
+  border-radius: 4px;
+  background: #cccccc7b;
+}
+
+.step.active {
+  background: #f70;
+}

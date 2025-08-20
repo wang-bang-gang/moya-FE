@@ -1,0 +1,87 @@
+.languageSelect{
+  width: 100%;
+  height: calc(var(--vh, 1vh) * 100);
+  background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),url('../images/LanguageSelect.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  box-sizing: border-box;
+  margin:0;
+  padding: 30px;
+}
+
+.selection-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 75%;
+  padding: 20px 0px;
+  gap: 15px;
+  background-color: rgba(0, 0, 0, 0.53);
+  border-radius: 12px;
+}
+
+.languageSelect button{
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  width: 90%;
+  height: 60px;
+  text-align: center;
+  background-color: #4a4a4a5e;
+  color: white;
+}
+
+img {
+  width: 30px;
+  height: 30px;
+  margin: 0px 65px 0px 0px;
+  
+}
+
+.O-of-MOYA {
+  color: #f70;
+}
+
+.moya-logo {
+    width: 100%;
+    font-size: 30px;
+    text-align: center;
+    font-family: 'RiaSans-ExtraBold', sans-serif;
+    font-size: 40px;
+    color: #fff;
+    margin: 0 0 10px 0;
+
+}
+
+
+.languageSelect p.describe{
+  margin: 0;
+  margin-bottom: 30px;
+  color: white;
+  font-family: 'PretendardVariable', sans-serif;
+  font-weight: normal;
+}
+
+.copyright {
+  font-size: 10px;
+  color: white;
+  font-family: 'PretendardVariable', sans-serif;
+}
+
+.languageSelect button:hover {
+  background-color: #f70;
+  border:none;
+}
+
+.languageSelect button:active {
+  background-color: #f70;
+  border:none;
+}

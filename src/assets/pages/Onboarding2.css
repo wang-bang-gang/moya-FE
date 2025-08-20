@@ -1,0 +1,89 @@
+/* Onboarding2.css */
+.onboarding-page2 {
+  width: 100%;
+  height: calc(var(--vh, 1vh) * 100);
+  background-image: url('../images/Onboarding2.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: start;
+  padding: 30px;
+  box-sizing: border-box;
+}
+
+.onboarding-page2::before {
+  inset: 0;
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 0;
+}
+
+.onboarding-page2 h1,
+.onboarding-page2 p {
+  position: relative;
+  z-index: 1;
+  margin: 0; 
+  color: #fff;
+}
+
+.onboarding-page2 h1 {
+    font-family: 'RiaSans-ExtraBold', sans-serif;
+    font-size: 40px;
+    margin-bottom: 20px;
+}
+
+.slogan {
+  font-family: 'PretendardVariable', sans-serif;
+  font-weight: bold;
+  color: #fff;
+  font-size: 24px;
+}
+
+.onboarding-page2 p.describe {
+  font-family: 'PretendardVariable', sans-serif;
+  font-weight: normal;
+  color: #fff;
+  font-size: 15px;
+}
+
+.onboarding-page2 p.describe-top{
+  margin-top: 15px;
+}
+
+.O-of-MOYA {
+  color: #f70;
+}
+
+.next-btn2 {
+  position: absolute;
+  bottom: 50px;
+  right: 24px;
+  width: 75px;       
+  height: 75px;
+  border-radius: 50%;   /* 원형 만들기 */
+  background-color: rgba(255, 119, 0, 0.288);
+  color: #f70;
+  border: none;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-size: 30px;
+  cursor: pointer;
+  z-index: 2;
+
+  font-weight: bold;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.next-btn2:hover {
+  background-color: rgba(255, 255, 255, 0.512);
+  border:none;
+}
