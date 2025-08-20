@@ -63,7 +63,7 @@
   height: 75px;
   border-radius: 50%;   /* 원형 만들기 */
   background-color: rgba(255, 119, 0, 0.288);
-  color: #f70;
+  color: rgb(0, 255, 225);
   border: none;
   max-width: calc(100% - 24px);
 
