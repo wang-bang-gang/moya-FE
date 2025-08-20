@@ -1,5 +1,5 @@
 import { useLocation } from "react-router-dom";
-import "./ProgressBar.css";
+import "./Progressbar.css";
 
 function ProgressBar() {
   const location = useLocation();
