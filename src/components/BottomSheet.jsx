@@ -9,8 +9,8 @@ export default function BottomSheet({ title, children }) {
   const startH = useRef(0);
   const dragging = useRef(false);
 
-  const COLLAPSED = 60; // vh
-  const EXPANDED = 90;  // vh
+  const COLLAPSED = 55; // vh
+  const EXPANDED = 80;  // vh
 
   function onDown(e) {
     dragging.current = true;
