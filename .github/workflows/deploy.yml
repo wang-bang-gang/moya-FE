@@ -1,11 +1,9 @@
 name: Deploy Frontend to EC2
-
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -22,17 +20,31 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
           cd moya-FE
+          
+          # 현재 상태 확인 및 초기화
+          echo "=== Current git status ==="
+          git status
+          
+          # 로컬 변경사항 제거하고 최신으로 업데이트
+          git stash
+          git reset --hard HEAD
           git pull origin main
+          
+          echo "=== After pull ==="
+          git log --oneline -3
           
           # 기존 컨테이너 정지 및 제거
           docker stop moya-frontend-container || true
           docker rm moya-frontend-container || true
           docker rmi moya-fe || true
           
-          # 새 이미지 빌드 및 실행
-          docker build -t moya-fe .
+          # Docker 캐시 정리 및 새 이미지 빌드
+          docker system prune -f
+          docker build --no-cache -t moya-fe .
           docker run -d -p 80:80 --name moya-frontend-container moya-fe
           
-          # 컨테이너 상태 확인
+          # 배포 결과 확인
+          echo "=== Container status ==="
           docker ps
-
+          echo "=== Git final status ==="
+          git log --oneline -1
