@@ -137,40 +137,106 @@ export default function PlaceDetailPage() {
     }
   };
 
-  // 오디오 재생/정지
-  const handlePlayPause = async () => {
-    try {
-      if (!audioRef.current) {
-        // 더미 오디오 생성
-        const dummyAudioUrl = "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav";
-        audioRef.current = new Audio(dummyAudioUrl);
-        
-        // 오디오 이벤트 설정
-        audioRef.current.addEventListener('timeupdate', () => {
-          setCurrentTime(audioRef.current.currentTime);
-        });
-        
-        audioRef.current.addEventListener('ended', () => {
-          setIsPlaying(false);
-          setCurrentTime(0);
-        });
-        
-        audioRef.current.addEventListener('loadedmetadata', () => {
-          setDuration(audioRef.current.duration);
-        });
-      }
-
-      if (isPlaying) {
-        audioRef.current.pause();
+// 오디오 재생/정지
+// 오디오 재생/정지 함수 개선버전
+const handlePlayPause = async () => {
+  try {
+    if (!audioRef.current) {
+      console.log("오디오 객체 생성 시작");
+      
+      // 더미 오디오 생성
+      const dummyAudioUrl = "https://d3al414gz151lh.cloudfront.net/ko_samsung.mp3";
+      audioRef.current = new Audio(dummyAudioUrl);
+      
+      // 오디오 로드 시작
+      audioRef.current.addEventListener('loadstart', () => {
+        console.log('오디오 로드 시작');
+      });
+      
+      // 오디오 로드 완료
+      audioRef.current.addEventListener('canplay', () => {
+        console.log('오디오 재생 준비 완료');
+      });
+      
+      // 오디오 로드 중
+      audioRef.current.addEventListener('loadeddata', () => {
+        console.log('오디오 데이터 로드됨');
+      });
+      
+      // 오디오 에러
+      audioRef.current.addEventListener('error', (e) => {
+        console.error('오디오 에러:', e);
+        console.error('에러 상세:', audioRef.current.error);
+        if (audioRef.current.error) {
+          switch(audioRef.current.error.code) {
+            case 1:
+              console.error('MEDIA_ERR_ABORTED: 재생이 중단됨');
+              break;
+            case 2:
+              console.error('MEDIA_ERR_NETWORK: 네트워크 오류');
+              break;
+            case 3:
+              console.error('MEDIA_ERR_DECODE: 디코딩 오류');
+              break;
+            case 4:
+              console.error('MEDIA_ERR_SRC_NOT_SUPPORTED: 지원하지 않는 형식');
+              break;
+          }
+        }
+      });
+      
+      // 기존 이벤트들
+      audioRef.current.addEventListener('timeupdate', () => {
+        setCurrentTime(audioRef.current.currentTime);
+      });
+      
+      audioRef.current.addEventListener('ended', () => {
         setIsPlaying(false);
-      } else {
-        await audioRef.current.play();
+        setCurrentTime(0);
+      });
+      
+      audioRef.current.addEventListener('loadedmetadata', () => {
+        console.log('메타데이터 로드됨, 총 시간:', audioRef.current.duration);
+        setDuration(audioRef.current.duration);
+      });
+
+      // 오디오 로드 시작
+      console.log('오디오 로드 시작:', dummyAudioUrl);
+      audioRef.current.load();
+    }
+
+    if (isPlaying) {
+      console.log('오디오 일시정지');
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      console.log('오디오 재생 시도');
+      
+      // 브라우저 정책으로 인한 재생 거부 확인
+      const playPromise = audioRef.current.play();
+      
+      if (playPromise !== undefined) {
+        await playPromise;
+        console.log('오디오 재생 성공');
         setIsPlaying(true);
       }
-    } catch (error) {
-      console.error("오디오 재생 오류:", error);
     }
-  };
+  } catch (error) {
+    console.error("오디오 재생 오류:", error);
+    
+    // 자세한 에러 정보
+    if (error.name === 'NotAllowedError') {
+      console.error('브라우저가 자동재생을 차단함 - 사용자 상호작용 필요');
+      alert('오디오 재생을 위해 브라우저 권한을 허용해주세요.');
+    } else if (error.name === 'NotSupportedError') {
+      console.error('지원하지 않는 오디오 형식');
+      alert('오디오 형식을 지원하지 않습니다.');
+    } else {
+      console.error('기타 오디오 오류:', error.message);
+      alert('오디오 재생 중 오류가 발생했습니다.');
+    }
+  }
+};
 
   // 프로그레스 바 클릭
   const handleProgressClick = (e) => {

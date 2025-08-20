@@ -19,7 +19,7 @@ const mapOptions = {
   ],
 };
 
-// 거리 계산 (Haversine)
+// 거리 계산 (Haversine) - 더미 데이터용 백업
 function distanceMeters(a, b) {
   const R = 6371000;
   const toRad = (d) => (d * Math.PI) / 180;
@@ -33,10 +33,9 @@ function distanceMeters(a, b) {
   return 2 * R * Math.asin(Math.sqrt(h));
 }
 
-function formatDistance(m) {
-  if (m == null) return "";
-  if (m < 1000) return `${Math.round(m)}m`;
-  return `${(m / 1000).toFixed(m < 15000 ? 1 : 0)}km`;
+function formatDistance(km) {
+  if (km == null) return "";
+  return `${km.toFixed(1)}km`;
 }
 
 // 마지막 위치 캐시 로드
@@ -52,7 +51,75 @@ function loadSavedPos() {
   return null;
 }
 
-// 더미 API (locale 활용)
+// 실제 백엔드 API 호출 함수
+async function fetchNearbyPlaces(lat, lng, locale = 'ko') {
+  // 위치 정보가 없으면 더미 데이터 반환
+  if (!lat || !lng) {
+    console.warn('위치 정보가 없어서 더미 데이터를 사용합니다.');
+    return await fetchPlacesDummy(lat, lng, locale);
+  }
+
+  try {
+    // 실제 백엔드 API 호출
+    const API_BASE_URL = "http://54.180.86.248:8080/";
+    const queryParams = new URLSearchParams({
+      lat: lat.toString(),
+      lng: lng.toString(),
+      locale: locale
+    });
+
+    console.log('백엔드 API 호출:', `${API_BASE_URL}api/places/nearby?${queryParams}`);
+
+    const response = await fetch(`${API_BASE_URL}api/places/nearby?${queryParams}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`서버 오류: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('백엔드 응답 데이터:', data);
+
+    // 백엔드 응답을 기존 형식에 맞게 변환
+    const transformedData = data.map((p) => ({
+      // 백엔드 응답 필드 매핑
+      place_no: p.id,
+      lat: p.lat,
+      lng: p.lng,
+      like: p.likeCount,
+      business_hours: "정보 없음", // 백엔드에서 제공하지 않는 경우
+      image: p.imageUrl,
+      place_name: p.name, // 이미 locale에 맞는 이름
+      place_description: p.description, // 이미 locale에 맞는 설명
+      audio_preview_key: p.audioPreviewKey,
+      audio_full_key: p.audioPreviewKey, // 전체 버전이 따로 있다면 수정
+      audio_duration: 180, // 기본값, 실제로는 백엔드에서 제공해야 함
+      
+      // 프론트엔드에서 사용하는 형식
+      id: `place_${p.id}`,
+      nameEn: p.name,
+      likes: p.likeCount,
+      thumb: p.imageUrl,
+      distanceM: p.distance, // 백엔드에서 km로 주므로 그대로 사용 (formatDistance에서 km로 표시)
+    }));
+
+    // 백엔드에서 이미 거리순으로 정렬해서 보내주므로 추가 정렬 불필요
+    return transformedData;
+
+  } catch (error) {
+    console.error('백엔드 API 호출 실패:', error);
+    console.log('더미 데이터로 대체합니다.');
+    
+    // 백엔드 실패시 더미 데이터로 대체 (개발 중 안정성)
+    return await fetchPlacesDummy(lat, lng, locale);
+  }
+}
+
+// 더미 API (백업용 - locale 활용)
 async function fetchPlacesDummy(lat, lng, locale = 'ko') {
   const me = lat && lng ? { lat, lng } : null;
   
@@ -169,7 +236,7 @@ async function fetchPlacesDummy(lat, lng, locale = 'ko') {
     nameEn: p.place_name, // 이제 locale에 따른 번역된 이름
     likes: p.like,
     thumb: p.image,
-    distanceM: me ? distanceMeters(me, { lat: p.lat, lng: p.lng }) : null,
+    distanceM: me ? (distanceMeters(me, { lat: p.lat, lng: p.lng }) / 1000) : null, // m를 km로 변환
   }));
   
   withDistance.sort((a, b) => (a.distanceM ?? 1e12) - (b.distanceM ?? 1e12));
@@ -265,7 +332,7 @@ export default function MapPage() {
       try {
         const lat = userLocation?.lat;
         const lng = userLocation?.lng;
-        const list = await fetchPlacesDummy(lat, lng, locale); // locale 전달
+        const list = await fetchNearbyPlaces(lat, lng, locale); // 백엔드 API 호출
         if (!stop) setPlaces(list);
       } catch (e) {
         if (!stop) setError(String(e));

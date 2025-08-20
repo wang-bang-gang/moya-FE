@@ -11,11 +11,11 @@ function LanguageSelect(){
   const navigate = useNavigate();
   const { changeLanguage } = useLanguage();
 
-  // 언어 선택 및 페이지 이동
+  // 언어 선택 및 페이지 이동 (단순화)
   const handleLanguageSelect = (locale) => {
     changeLanguage(locale);
     console.log(`언어 변경됨: ${locale}`);
-    navigate("/MapPage");
+    navigate("/MapPage"); // 바로 이동
   };
 
   return (
@@ -23,6 +23,7 @@ function LanguageSelect(){
       <ProgressBar/>
       <h1 className='moya-logo'>M<span className='O-of-MOYA'>O</span>YA</h1>
       <p className='describe'>Memory Of Your Voice</p>
+      
       <div className='selection-box'>
         <button onClick={() => handleLanguageSelect('ko')}>
           <img src={Korea_flag} alt="한국어"/>
