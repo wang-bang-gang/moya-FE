@@ -68,9 +68,9 @@ async function fetchNearbyPlaces(lat, lng, locale = 'ko') {
       locale: locale
     });
 
-    console.log('백엔드 API 호출:', `${API_BASE_URL}api/places/nearby?${queryParams}`);
+    console.log('백엔드 API 호출:', `${API_BASE_URL}/api/places/nearby?${queryParams}`);
 
-    const response = await fetch(`${API_BASE_URL}api/places/nearby?${queryParams}`, {
+    const response = await fetch(`${API_BASE_URL}/api/places/nearby?${queryParams}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

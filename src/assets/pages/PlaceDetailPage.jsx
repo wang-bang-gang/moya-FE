@@ -72,7 +72,7 @@ export default function PlaceDetailPage() {
       console.log('추가 상세 정보 요청:', placeNo);
       
       const response = await fetch(
-        `${API_BASE_URL}api/places/${placeNo}/detail?locale=${locale}`,
+        `${API_BASE_URL}/api/places/${placeNo}/detail?locale=${locale}`,
         {
           method: 'GET',
           headers: {
@@ -113,7 +113,7 @@ export default function PlaceDetailPage() {
       let nearbyPlaceData = null;
       try {
         const nearbyResponse = await fetch(
-          `${API_BASE_URL}api/places/nearby?lat=33.4996&lng=126.5312&locale=${locale}`,
+          `${API_BASE_URL}/api/places/nearby?lat=33.4996&lng=126.5312&locale=${locale}`,
           {
             method: 'GET',
             headers: {
@@ -138,7 +138,7 @@ export default function PlaceDetailPage() {
       let detailData = null;
       try {
         const detailResponse = await fetch(
-          `${API_BASE_URL}api/places/${placeNo}/detail?locale=${locale}`,
+          `${API_BASE_URL}/api/places/${placeNo}/detail?locale=${locale}`,
           {
             method: 'GET',
             headers: {
