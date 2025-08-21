@@ -9,6 +9,8 @@ export default function PlaceDetailPage() {
   const location = useLocation(); // state 데이터 받기 위해 추가
   const { locale, t } = useLanguage(); // t 함수도 가져오기
   const audioRef = useRef(null);
+
+  const API_BASE_URL = import.meta.env.VITE_SPRING_API_URL;
   
   // API 상태 관리
   const [placeData, setPlaceData] = useState(null);
@@ -23,6 +25,7 @@ export default function PlaceDetailPage() {
   const [likes, setLikes] = useState(0);
   const [showFullScript, setShowFullScript] = useState(false);
 
+  
   // 다국어 텍스트 반환 함수
   const getLocalizedText = (key, fallback = "") => {
     return t(key) || fallback;
@@ -69,7 +72,7 @@ export default function PlaceDetailPage() {
       console.log('추가 상세 정보 요청:', placeNo);
       
       const response = await fetch(
-        `https://d3e5n07qpnkfk8.cloudfront.net/api/places/${placeNo}/detail?locale=${locale}`,
+        `${API_BASE_URL}api/places/${placeNo}/detail?locale=${locale}`,
         {
           method: 'GET',
           headers: {
@@ -110,7 +113,7 @@ export default function PlaceDetailPage() {
       let nearbyPlaceData = null;
       try {
         const nearbyResponse = await fetch(
-          `https://d3e5n07qpnkfk8.cloudfront.net/api/places/nearby?lat=33.4996&lng=126.5312&locale=${locale}`,
+          `${API_BASE_URL}api/places/nearby?lat=33.4996&lng=126.5312&locale=${locale}`,
           {
             method: 'GET',
             headers: {
@@ -135,7 +138,7 @@ export default function PlaceDetailPage() {
       let detailData = null;
       try {
         const detailResponse = await fetch(
-          `https://d3e5n07qpnkfk8.cloudfront.net/api/places/${placeNo}/detail?locale=${locale}`,
+          `${API_BASE_URL}api/places/${placeNo}/detail?locale=${locale}`,
           {
             method: 'GET',
             headers: {
@@ -437,7 +440,7 @@ export default function PlaceDetailPage() {
       const placeNo = id.startsWith('place_') ? id.replace('place_', '') : id;
       
       const response = await fetch(
-        `https://d3e5n07qpnkfk8.cloudfront.net/api/places/${placeNo}/like`, 
+        `${API_BASE_URL}/api/places/${placeNo}/like`, 
         {
           method: 'POST',
           headers: {

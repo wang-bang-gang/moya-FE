@@ -61,7 +61,7 @@ async function fetchNearbyPlaces(lat, lng, locale = 'ko') {
 
   try {
     // 실제 백엔드 API 호출
-    const API_BASE_URL = "https://d3e5n07qpnkfk8.cloudfront.net/";
+    const API_BASE_URL = import.meta.env.VITE_SPRING_API_URL;
     const queryParams = new URLSearchParams({
       lat: lat.toString(),
       lng: lng.toString(),
