@@ -141,7 +141,7 @@
 
 /* 하단 정보 섹션 */
 .infoSection {
-  padding: 50px 20px;
+  padding: 60px 20px 100px 20px;
   background: white;
   margin: -12px 0 0 0; /* 좌우 마진 제거 */
   border-radius: 0;
