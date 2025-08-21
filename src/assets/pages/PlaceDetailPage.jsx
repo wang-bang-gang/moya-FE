@@ -278,7 +278,7 @@ export default function PlaceDetailPage() {
       const placeNo = id.startsWith('place_') ? id.replace('place_', '') : id;
       
       const response = await fetch(
-        `https://dhk1izcva0sot.cloudfront.net/api/places/${placeNo}/like`, 
+        `https://dymv6es9ymnva.cloudfront.net/api/places/${placeNo}/like`, 
         {
           method: 'POST',
           headers: {
