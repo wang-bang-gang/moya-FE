@@ -61,7 +61,7 @@ async function fetchNearbyPlaces(lat, lng, locale = 'ko') {
 
   try {
     // 실제 백엔드 API 호출
-    const API_BASE_URL = "https://dhk1izcva0sot.cloudfront.net/";
+    const API_BASE_URL = "https://dymv6es9ymnva.cloudfront.net/";
     const queryParams = new URLSearchParams({
       lat: lat.toString(),
       lng: lng.toString(),
@@ -89,7 +89,6 @@ async function fetchNearbyPlaces(lat, lng, locale = 'ko') {
       throw new Error('백엔드 응답이 배열이 아닙니다');
     }
 
-    // 백엔드 응답을 기존 형식에 맞게 변환
     const transformedData = data.map((p) => ({
       // 백엔드 응답 필드 매핑
       place_no: p.id,
