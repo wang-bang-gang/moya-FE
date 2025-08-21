@@ -4,7 +4,10 @@ import { GoogleMap, MarkerF } from "@react-google-maps/api";
 import { useLanguage } from "../../contexts/LanguageContext";
 import BottomSheet from "../../components/BottomSheet.jsx"
 import PlaceCard from "../../components/PlaceCard.jsx";
+import ChatbotModal from "../../components/ChatbotModal.jsx";
 import "./MapPage.css";
+
+
 
 // 기본 중심 (제주)
 const DEFAULT_CENTER = { lat: 33.4996, lng: 126.5312 };
@@ -579,6 +582,12 @@ const handleAudioPreview = async (place) => {
       }
     };
   }, []);
+  
+  const [showChatbot, setShowChatbot] = useState(false);
+
+  const handleChatbotClick = () => {
+  setShowChatbot(true);
+  };
 
   return (
     <>
@@ -637,6 +646,12 @@ const handleAudioPreview = async (place) => {
         >
           <i className="fa-solid fa-globe"></i>
         </button>
+        <button 
+          className="chatbotBtn"
+          onClick={handleChatbotClick}
+        >
+          <i className="fa-solid fa-robot"></i>
+        </button>
       </div>
 
       <BottomSheet
@@ -674,6 +689,9 @@ const handleAudioPreview = async (place) => {
           />
         ))}
       </BottomSheet>
+      <ChatbotModal 
+      isOpen={showChatbot} 
+      onClose={() => setShowChatbot(false)} />
     </>
   );
 }
