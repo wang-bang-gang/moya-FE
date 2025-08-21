@@ -135,7 +135,7 @@
   color: white;
   font-size: 14px;
   font-weight: 600;
-  min-width: 40px;
+  min-width: 80px; /* 더 넓게 설정 */
   text-align: right;
 }
 
@@ -255,6 +255,67 @@
   margin-left: 0;
 }
 
+/* 로딩 및 에러 상태 스타일 (새로 추가) */
+.loadingState, .errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 40px 20px;
+  text-align: center;
+  color: #666;
+}
+
+.loadingState .loadingSpinner {
+  font-size: 48px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+  color: #ff8a00;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.errorState {
+  color: #e74c3c;
+}
+
+.errorState i {
+  font-size: 64px;
+  margin-bottom: 20px;
+  color: #e74c3c;
+}
+
+.errorState p {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 20px 0;
+}
+
+.errorState button {
+  background: #ff8a00;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.errorState button:hover {
+  background: #e67c00;
+}
+
+/* 오디오 플레이어가 없을 때 공간 조정 (새로 추가) */
+.heroSection:not(.has-audio) {
+  justify-content: space-between;
+}
+
 /* 반응형 */
 @media (max-width: 768px) {
   .placeDetailPage {
@@ -327,5 +388,27 @@
   
   .likeButton i {
     font-size: 20px;
+  }
+
+  /* 모바일에서 로딩/에러 상태 개선 (새로 추가) */
+  .loadingState, .errorState {
+    padding: 20px;
+  }
+  
+  .loadingState .loadingSpinner {
+    font-size: 36px;
+  }
+  
+  .errorState i {
+    font-size: 48px;
+  }
+  
+  .errorState p {
+    font-size: 16px;
+  }
+  
+  .timeDisplay {
+    min-width: 70px;
+    font-size: 12px;
   }
 }
