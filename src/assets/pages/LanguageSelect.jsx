@@ -33,11 +33,11 @@ function LanguageSelect(){
           <img src={USA_flag} alt="English"/>
           <p>ENGLISH</p>
         </button>
-        <button onClick={() => handleLanguageSelect('zh')}>
+        <button onClick={() => handleLanguageSelect('cn')}>
           <img src={China_flag} alt="简体中文"/>
           <p>简体中文</p>
         </button>
-        <button onClick={() => handleLanguageSelect('ja')}>
+        <button onClick={() => handleLanguageSelect('jp')}>
           <img src={Japan_flag} alt="日本語"/>
           <p>日本語</p>
         </button>

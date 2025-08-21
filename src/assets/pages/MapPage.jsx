@@ -61,7 +61,7 @@ async function fetchNearbyPlaces(lat, lng, locale = 'ko') {
 
   try {
     // 실제 백엔드 API 호출
-    const API_BASE_URL = "https://dymv6es9ymnva.cloudfront.net/";
+    const API_BASE_URL = "https://d3e5n07qpnkfk8.cloudfront.net/";
     const queryParams = new URLSearchParams({
       lat: lat.toString(),
       lng: lng.toString(),
@@ -479,80 +479,77 @@ export default function MapPage() {
   };
 
   // 오디오 미리듣기 함수 (실제 API 사용)
-  const handleAudioPreview = async (place) => {
-    try {
-      // 현재 재생 중인 오디오가 있으면 정지
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
-      }
-
-      // 같은 플레이스를 다시 클릭하면 정지
-      if (playingPlaceId === place.id) {
-        setPlayingPlaceId(null);
-        return;
-      }
-
-      console.log("오디오 미리듣기 요청:", place.nameEn);
-
-      // 실제 API 호출로 오디오 미리듣기 파일 요청
-      let audioUrl;
-      
-      if (place.audio_preview_key) {
-        // 실제 구현: 백엔드에서 오디오 파일 URL 반환
-        // const response = await fetch(`/api/places/${place.place_no}/audio/preview`);
-        // const audioData = await response.json();
-        // audioUrl = audioData.url;
-        
-        // 더미: 테스트용 오디오 URL
-        audioUrl = "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav";
-      } else {
-        throw new Error("오디오 파일이 없습니다.");
-      }
-      
-      // 새로운 Audio 객체 생성
-      const audio = new Audio(audioUrl);
-      audioRef.current = audio;
-
-      // 즉시 재생 상태로 설정
-      setPlayingPlaceId(place.id);
-
-      // 오디오 이벤트 리스너 설정
-      audio.addEventListener('loadeddata', () => {
-        console.log("오디오 재생 시작");
-      });
-
-      audio.addEventListener('ended', () => {
-        setPlayingPlaceId(null);
-        console.log("오디오 재생 완료");
-      });
-
-      audio.addEventListener('error', (e) => {
-        setPlayingPlaceId(null);
-        console.error("오디오 재생 오류:", e);
-        alert("오디오 재생 중 오류가 발생했습니다.");
-      });
-
-      // 30초 후 자동 정지 (또는 실제 preview 길이 사용)
-      const previewDuration = 30000; // place.audio_duration * 1000 / 6 등으로 계산 가능
-      setTimeout(() => {
-        if (audio && !audio.paused) {
-          audio.pause();
-          setPlayingPlaceId(null);
-          console.log("30초 미리듣기 완료");
-        }
-      }, previewDuration);
-
-      // 재생 시작
-      await audio.play();
-
-    } catch (error) {
-      setPlayingPlaceId(null);
-      console.error("오디오 미리듣기 오류:", error);
-      alert("오디오를 불러올 수 없습니다. 다시 시도해주세요.");
+  // 오디오 미리듣기 함수 (CDN 링크 직접 사용)
+const handleAudioPreview = async (place) => {
+  try {
+    // 현재 재생 중인 오디오가 있으면 정지
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
     }
-  };
 
+    // 같은 플레이스를 다시 클릭하면 정지
+    if (playingPlaceId === place.id) {
+      setPlayingPlaceId(null);
+      return;
+    }
+
+    console.log("오디오 미리듣기 요청:", place.nameEn);
+
+    // CDN URL이 있는지 확인
+    if (!place.audio_preview_key) {
+      throw new Error("오디오 파일이 없습니다.");
+    }
+
+    // CDN URL 직접 사용
+    const audioUrl = place.audio_preview_key;
+    console.log("오디오 URL:", audioUrl);
+    
+    // 새로운 Audio 객체 생성
+    const audio = new Audio(audioUrl);
+    audioRef.current = audio;
+
+    // 즉시 재생 상태로 설정
+    setPlayingPlaceId(place.id);
+
+    // 오디오 이벤트 리스너 설정
+    audio.addEventListener('loadeddata', () => {
+      console.log("오디오 재생 시작");
+    });
+
+    audio.addEventListener('ended', () => {
+      setPlayingPlaceId(null);
+      console.log("오디오 재생 완료");
+    });
+
+    audio.addEventListener('error', (e) => {
+      setPlayingPlaceId(null);
+      console.error("오디오 재생 오류:", e);
+      alert("오디오 재생 중 오류가 발생했습니다.");
+    });
+
+    // 30초 후 자동 정지 (또는 실제 preview 길이 사용)
+    const previewDuration = 30000; // place.audio_duration * 1000 / 6 등으로 계산 가능
+    const autoStopTimer = setTimeout(() => {
+      if (audio && !audio.paused) {
+        audio.pause();
+        setPlayingPlaceId(null);
+        console.log("30초 미리듣기 완료");
+      }
+    }, previewDuration);
+
+    // 재생 시작
+    await audio.play();
+
+    // audio 객체에 타이머 참조 저장 (정리용)
+    audio.autoStopTimer = autoStopTimer;
+
+  } catch (error) {
+    setPlayingPlaceId(null);
+    console.error("오디오 미리듣기 오류:", error);
+    alert("오디오를 불러올 수 없습니다. 다시 시도해주세요.");
+  }
+};
   // Google Maps API가 이미 로드되어 있는지 확인
   const isGoogleMapsLoaded = () => {
     return window.google && window.google.maps && window.google.maps.Map;

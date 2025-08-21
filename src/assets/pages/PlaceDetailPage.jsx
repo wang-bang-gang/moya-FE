@@ -36,7 +36,7 @@ export default function PlaceDetailPage() {
         
         // 실제 API 엔드포인트 호출
         const response = await fetch(
-          ` https://dymv6es9ymnva.cloudfront.net/api/places/${placeNo}/detail`,
+          `https://d3e5n07qpnkfk8.cloudfront.net/api/places/${placeNo}/detail`,
           {
             method: 'GET',
             headers: {
@@ -278,7 +278,7 @@ export default function PlaceDetailPage() {
       const placeNo = id.startsWith('place_') ? id.replace('place_', '') : id;
       
       const response = await fetch(
-        `https://dymv6es9ymnva.cloudfront.net/api/places/${placeNo}/like`, 
+        `https://d3e5n07qpnkfk8.cloudfront.net/api/places/${placeNo}/like`, 
         {
           method: 'POST',
           headers: {
@@ -442,7 +442,7 @@ export default function PlaceDetailPage() {
         <div className="description">
           <p>
             {showFullScript ? placeData.description : 
-             (placeData.description.length > 100 ? 
+              (placeData.description.length > 100 ? 
               placeData.description.substring(0, 100) + '...' : 
               placeData.description)
             }
