@@ -7,7 +7,7 @@ export default function PlaceDetailPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const location = useLocation(); // state 데이터 받기 위해 추가
-  const { locale } = useLanguage();
+  const { locale, t } = useLanguage(); // t 함수도 가져오기
   const audioRef = useRef(null);
   
   // API 상태 관리
@@ -23,6 +23,11 @@ export default function PlaceDetailPage() {
   const [likes, setLikes] = useState(0);
   const [showFullScript, setShowFullScript] = useState(false);
 
+  // 다국어 텍스트 반환 함수
+  const getLocalizedText = (key, fallback = "") => {
+    return t(key) || fallback;
+  };
+
   // MapPage에서 전달받은 데이터가 있는지 확인
   useEffect(() => {
     const passedPlaceData = location.state?.placeData;
@@ -35,9 +40,9 @@ export default function PlaceDetailPage() {
         id: passedPlaceData.id,
         name: passedPlaceData.nameEn || passedPlaceData.place_name,
         image: passedPlaceData.thumb || passedPlaceData.image || "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=2340&q=80",
-        hours: passedPlaceData.business_hours || "정보 없음",
+        hours: passedPlaceData.business_hours || getLocalizedText('no_info', '정보 없음'),
         likes: passedPlaceData.likes || passedPlaceData.like || 0,
-        description: passedPlaceData.place_description || "설명이 없습니다.",
+        description: passedPlaceData.place_description || getLocalizedText('no_description', '설명이 없습니다.'),
         audioFullUrl: passedPlaceData.audio_full_key || passedPlaceData.audio_preview_key,
         audioDuration: passedPlaceData.audio_duration || 180
       };
@@ -64,7 +69,7 @@ export default function PlaceDetailPage() {
       console.log('추가 상세 정보 요청:', placeNo);
       
       const response = await fetch(
-        `https://d3e5n07qpnkfk8.cloudfront.net/api/places/${placeNo}/detail`,
+        `https://d3e5n07qpnkfk8.cloudfront.net/api/places/${placeNo}/detail?locale=${locale}`,
         {
           method: 'GET',
           headers: {
@@ -101,7 +106,7 @@ export default function PlaceDetailPage() {
       const placeNo = id.startsWith('place_') ? id.replace('place_', '') : id;
       console.log('API로 장소 정보 요청:', placeNo);
       
-      // 1. nearby API에서 기본 정보 가져오기
+      // 1. nearby API에서 기본 정보 가져오기 (locale 포함)
       let nearbyPlaceData = null;
       try {
         const nearbyResponse = await fetch(
@@ -126,11 +131,11 @@ export default function PlaceDetailPage() {
         console.warn('nearby API 호출 실패:', nearbyError);
       }
 
-      // 2. detail API에서 상세 정보 가져오기
+      // 2. detail API에서 상세 정보 가져오기 (locale 포함)
       let detailData = null;
       try {
         const detailResponse = await fetch(
-          `https://d3e5n07qpnkfk8.cloudfront.net/api/places/${placeNo}/detail`,
+          `https://d3e5n07qpnkfk8.cloudfront.net/api/places/${placeNo}/detail?locale=${locale}`,
           {
             method: 'GET',
             headers: {
@@ -151,11 +156,11 @@ export default function PlaceDetailPage() {
       if (nearbyPlaceData || detailData) {
         const combinedData = {
           id: id,
-          name: nearbyPlaceData?.name || detailData?.name || "Unknown Place",
+          name: nearbyPlaceData?.name || detailData?.name || getLocalizedText('unknown_place', 'Unknown Place'),
           image: nearbyPlaceData?.imageUrl || detailData?.imageUrl || "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=2340&q=80",
-          hours: detailData?.businessHours || "정보 없음",
+          hours: detailData?.businessHours || getLocalizedText('no_info', '정보 없음'),
           likes: nearbyPlaceData?.likeCount || detailData?.likeCount || 0,
-          description: nearbyPlaceData?.description || detailData?.description || "설명이 없습니다.",
+          description: nearbyPlaceData?.description || detailData?.description || getLocalizedText('no_description', '설명이 없습니다.'),
           audioFullUrl: detailData?.audioFullUrl || nearbyPlaceData?.audioPreviewKey,
           audioDuration: detailData?.audioDuration || 180
         };
@@ -179,7 +184,7 @@ export default function PlaceDetailPage() {
     }
   };
 
-  // 더미 데이터 생성 함수 (API 실패시 폴백용)
+  // 더미 데이터 생성 함수 (API 실패시 폴백용) - 다국어 지원
   const getDummyPlaceData = (placeId, currentLocale) => {
     const dummyData = {
       ko: {
@@ -219,7 +224,7 @@ export default function PlaceDetailPage() {
           id: "place_1",
           name: "Snoopy Garden",
           image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=2340&q=80",
-          hours: "09:00 ~ 18:00",
+          hours: "09:00 AM ~ 06:00 PM",
           likes: 739,
           description: "A beautiful garden featuring Snoopy and Peanuts characters. Perfect for family visits and photography with stunning themed installations.",
           audioFullUrl: "https://d3al414gz151lh.cloudfront.net/ko_samsung.mp3",
@@ -242,6 +247,70 @@ export default function PlaceDetailPage() {
           hours: "24 hours",
           likes: 512,
           description: "A pristine white sand beach with crystal clear emerald waters. Popular for swimming and water sports with excellent facilities.",
+          audioFullUrl: "https://d3al414gz151lh.cloudfront.net/ko_samsung.mp3",
+          audioDuration: 195
+        }
+      },
+      zh: {
+        place_1: {
+          id: "place_1",
+          name: "史努比花园",
+          image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=2340&q=80",
+          hours: "上午09:00 ~ 下午06:00",
+          likes: 739,
+          description: "拥有史努比和花生漫画角色的美丽花园。适合全家一起享受的主题公园。",
+          audioFullUrl: "https://d3al414gz151lh.cloudfront.net/ko_samsung.mp3",
+          audioDuration: 180
+        },
+        place_2: {
+          id: "place_2",
+          name: "思连伊林荫道",
+          image: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=2342&q=80",
+          hours: "24小时",
+          likes: 739,
+          description: "被古树环绕的神秘森林小径。可以与大自然的声音一起治愈心灵的地方。",
+          audioFullUrl: "https://d3al414gz151lh.cloudfront.net/ko_samsung.mp3",
+          audioDuration: 210
+        },
+        place_3: {
+          id: "place_3",
+          name: "咸德海水浴场",
+          image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=2340&q=80",
+          hours: "24小时",
+          likes: 512,
+          description: "拥有清澈海水和白色沙滩的原始海滩。济州岛代表性的旅游景点之一。",
+          audioFullUrl: "https://d3al414gz151lh.cloudfront.net/ko_samsung.mp3",
+          audioDuration: 195
+        }
+      },
+      ja: {
+        place_1: {
+          id: "place_1",
+          name: "スヌーピーガーデン",
+          image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=2340&q=80",
+          hours: "午前09:00 ~ 午後06:00",
+          likes: 739,
+          description: "スヌーピーとピーナッツのキャラクターがいる美しい庭園。家族一緒に楽しめるテーマパークです。",
+          audioFullUrl: "https://d3al414gz151lh.cloudfront.net/ko_samsung.mp3",
+          audioDuration: 180
+        },
+        place_2: {
+          id: "place_2",
+          name: "サリョニの森の道",
+          image: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=2342&q=80",
+          hours: "24時間",
+          likes: 739,
+          description: "古い木々に囲まれた神秘的な森の道。自然の音と共に癒される場所です。",
+          audioFullUrl: "https://d3al414gz151lh.cloudfront.net/ko_samsung.mp3",
+          audioDuration: 210
+        },
+        place_3: {
+          id: "place_3",
+          name: "ハムドクビーチ",
+          image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=2340&q=80",
+          hours: "24時間",
+          likes: 512,
+          description: "透明な海と白い砂浜がある美しいビーチ。済州島の代表的な観光地の一つです。",
           audioFullUrl: "https://d3al414gz151lh.cloudfront.net/ko_samsung.mp3",
           audioDuration: 195
         }
@@ -298,7 +367,7 @@ export default function PlaceDetailPage() {
 
         audioRef.current.addEventListener('error', (e) => {
           console.error('오디오 에러:', e);
-          alert('오디오를 재생할 수 없습니다.');
+          alert(getLocalizedText('audio_error', '오디오를 재생할 수 없습니다.'));
           setIsPlaying(false);
         });
 
@@ -307,7 +376,7 @@ export default function PlaceDetailPage() {
       }
 
       if (!placeData?.audioFullUrl) {
-        alert('오디오 파일이 없습니다.');
+        alert(getLocalizedText('no_audio', '오디오 파일이 없습니다.'));
         return;
       }
 
@@ -330,11 +399,11 @@ export default function PlaceDetailPage() {
       console.error("오디오 재생 오류:", error);
       
       if (error.name === 'NotAllowedError') {
-        alert('오디오 재생을 위해 브라우저 권한을 허용해주세요.');
+        alert(getLocalizedText('audio_permission', '오디오 재생을 위해 브라우저 권한을 허용해주세요.'));
       } else if (error.name === 'NotSupportedError') {
-        alert('오디오 형식을 지원하지 않습니다.');
+        alert(getLocalizedText('audio_format_error', '오디오 형식을 지원하지 않습니다.'));
       } else {
-        alert('오디오 재생 중 오류가 발생했습니다.');
+        alert(getLocalizedText('audio_play_error', '오디오 재생 중 오류가 발생했습니다.'));
       }
       
       setIsPlaying(false);
@@ -401,7 +470,7 @@ export default function PlaceDetailPage() {
       setIsLiked(!isLiked);
       setLikes(prev => isLiked ? prev + 1 : prev - 1);
       
-      alert('좋아요 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
+      alert(getLocalizedText('like_error', '좋아요 처리 중 오류가 발생했습니다. 다시 시도해주세요.'));
     }
   };
 
@@ -428,7 +497,7 @@ export default function PlaceDetailPage() {
       <div className="placeDetailPage">
         <div className="loadingState">
           <div className="loadingSpinner">⟳</div>
-          <p>장소 정보를 불러오는 중...</p>
+          <p>{getLocalizedText('loading_place_info', '장소 정보를 불러오는 중...')}</p>
         </div>
       </div>
     );
@@ -440,8 +509,10 @@ export default function PlaceDetailPage() {
       <div className="placeDetailPage">
         <div className="errorState">
           <i className="fa-solid fa-exclamation-triangle"></i>
-          <p>장소 정보를 불러올 수 없습니다.</p>
-          <button onClick={() => navigate('/MapPage')}>돌아가기</button>
+          <p>{getLocalizedText('failed_to_load_place', '장소 정보를 불러올 수 없습니다.')}</p>
+          <button onClick={() => navigate('/MapPage')}>
+            {getLocalizedText('go_back', '돌아가기')}
+          </button>
         </div>
       </div>
     );
@@ -452,8 +523,10 @@ export default function PlaceDetailPage() {
     return (
       <div className="placeDetailPage">
         <div className="errorState">
-          <p>장소 정보가 없습니다.</p>
-          <button onClick={() => navigate('/MapPage')}>돌아가기</button>
+          <p>{getLocalizedText('no_place_info', '장소 정보가 없습니다.')}</p>
+          <button onClick={() => navigate('/MapPage')}>
+            {getLocalizedText('go_back', '돌아가기')}
+          </button>
         </div>
       </div>
     );
@@ -542,7 +615,7 @@ export default function PlaceDetailPage() {
                 onClick={() => setShowFullScript(true)}
                 aria-label="Show more description"
               >
-                더보기
+                {getLocalizedText('show_more', '더보기')}
               </button>
             )}
           </p>
@@ -553,7 +626,7 @@ export default function PlaceDetailPage() {
               onClick={() => setShowFullScript(false)}
               aria-label="Show less description"
             >
-              접기
+              {getLocalizedText('show_less', '접기')}
             </button>
           )}
         </div>
