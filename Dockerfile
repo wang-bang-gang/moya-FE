@@ -31,6 +31,10 @@ COPY --from=build /app/dist /usr/share/nginx/html
 # nginx 설정 파일 복사 (SPA 라우팅용)
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
+# nginx 스테이지에도 환경변수 설정
+ENV VITE_GOOGLE_MAPS_API_KEY=$VITE_GOOGLE_MAPS_API_KEY
+ENV VITE_SPRING_API_URL=https://d3e5n07qpnkfk8.cloudfront.net
+
 # 포트 노출
 EXPOSE 80
 
