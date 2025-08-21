@@ -1,8 +1,9 @@
-/* Onboarding_1.css */
+/* Onboarding1.css */
 .onboarding-page {
   width: 100%;
   height: calc(var(--vh, 1vh) * 100);
-  background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),url('../images/Onboarding1.png');
+  background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+    url("../images/Onboarding1.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -13,42 +14,59 @@
   align-items: start;
   padding: 30px;
   box-sizing: border-box;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* 페이지 나가는 애니메이션 */
+.onboarding-page.slide-out {
+  animation: slideOutToLeft 0.5s ease-in forwards;
 }
 
 .card {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  margin:0;
+  margin: 0;
 }
 
 .onboarding-page h1,
 .onboarding-page p {
   position: relative;
   z-index: 1;
-  margin: 0; 
+  margin: 0;
   color: #fff;
 }
 
 .onboarding-page h1 {
-    font-family: 'RiaSans-ExtraBold', sans-serif;
-    font-size: 40px;
-    margin-bottom: 20px;
+  font-family: "RiaSans-ExtraBold", sans-serif;
+  font-size: 40px;
+  margin-bottom: 20px;
+  animation: fadeInDown 0.8s ease-out;
 }
 
 .slogan {
-  font-family: 'PretendardVariable', sans-serif;
+  font-family: "PretendardVariable", sans-serif;
   font-weight: bold;
   color: #fff;
   font-size: 24px;
 }
 
+.onboarding-page .slogan:nth-child(1) {
+  animation: fadeInLeft 0.8s ease-out 0.2s both;
+}
+
+.onboarding-page .slogan:nth-child(2) {
+  animation: fadeInLeft 0.8s ease-out 0.4s both;
+}
+
 .onboarding-page p.describe {
-  font-family: 'PretendardVariable', sans-serif;
+  font-family: "PretendardVariable", sans-serif;
   font-weight: normal;
   color: #fff;
   font-size: 15px;
-  margin-top:15px;
+  margin-top: 15px;
+  animation: fadeInUp 0.8s ease-out 0.6s both;
 }
 
 .O-of-MOYA {
@@ -59,27 +77,88 @@
   position: absolute;
   bottom: 50px;
   right: 24px;
-  width: 75px;       
+  width: 75px;
   height: 75px;
-  border-radius: 50%;   /* 원형 만들기 */
+  border-radius: 50%;
   background-color: rgba(255, 119, 0, 0.288);
   color: #f70;
   border: none;
   max-width: calc(100% - 24px);
-
   display: flex;
   justify-content: center;
   align-items: center;
-
   font-size: 30px;
   cursor: pointer;
   z-index: 2;
-
   font-weight: bold;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  animation: fadeInScale 0.8s ease-out 0.8s both;
 }
 
 .next-btn:hover {
   background-color: rgba(255, 255, 255, 0.512);
-  border:none;
+  border: none;
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(255, 119, 0, 0.4);
+}
+
+.next-btn:active {
+  transform: scale(0.95);
+}
+
+/* 애니메이션 키프레임들 */
+@keyframes slideOutToLeft {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    transform: translateX(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }

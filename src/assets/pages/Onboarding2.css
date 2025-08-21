@@ -2,7 +2,7 @@
 .onboarding-page2 {
   width: 100%;
   height: calc(var(--vh, 1vh) * 100);
-  background-image: url('../images/Onboarding2.png');
+  background-image: url("../images/Onboarding2.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -13,77 +13,206 @@
   align-items: start;
   padding: 30px;
   box-sizing: border-box;
+  animation: slideInFromRight 0.5s ease-out;
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 .onboarding-page2::before {
   inset: 0;
   content: "";
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.7);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
   z-index: 0;
+}
+
+.onboarding-page2.slide-out {
+  animation: slideOutToLeft 0.5s ease-in forwards;
 }
 
 .onboarding-page2 h1,
 .onboarding-page2 p {
   position: relative;
   z-index: 1;
-  margin: 0; 
+  margin: 0;
   color: #fff;
 }
 
 .onboarding-page2 h1 {
-    font-family: 'RiaSans-ExtraBold', sans-serif;
-    font-size: 40px;
-    margin-bottom: 20px;
+  font-family: "RiaSans-ExtraBold", sans-serif;
+  font-size: 40px;
+  margin-bottom: 20px;
+  animation: fadeInDown 0.8s ease-out 0.2s both;
 }
 
 .slogan {
-  font-family: 'PretendardVariable', sans-serif;
+  font-family: "PretendardVariable", sans-serif;
   font-weight: bold;
   color: #fff;
   font-size: 24px;
 }
 
+.onboarding-page2 .slogan:nth-child(1) {
+  animation: fadeInLeft 0.8s ease-out 0.4s both;
+}
+
+.onboarding-page2 .slogan:nth-child(2) {
+  animation: fadeInLeft 0.8s ease-out 0.6s both;
+}
+
 .onboarding-page2 p.describe {
-  font-family: 'PretendardVariable', sans-serif;
+  font-family: "PretendardVariable", sans-serif;
   font-weight: normal;
   color: #fff;
   font-size: 15px;
 }
 
-.onboarding-page2 p.describe-top{
+.onboarding-page2 p.describe-top {
   margin-top: 15px;
+  animation: fadeInUp 0.8s ease-out 0.8s both;
+}
+
+.onboarding-page2 .describe p:nth-child(2) {
+  animation: fadeInUp 0.8s ease-out 1s both;
+}
+
+.onboarding-page2 .describe p:nth-child(3) {
+  animation: fadeInUp 0.8s ease-out 1.2s both;
 }
 
 .O-of-MOYA {
   color: #f70;
 }
 
+/* 버튼 스타일 (JSX에서 next-btn 클래스 사용하므로) */
+.next-btn {
+  position: absolute;
+  bottom: 50px;
+  right: 24px;
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+  background-color: rgba(255, 119, 0, 0.288);
+  color: #f70;
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 30px;
+  cursor: pointer;
+  z-index: 2;
+  font-weight: bold;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  animation: fadeInScale 0.8s ease-out 1.4s both;
+}
+
+.next-btn:hover {
+  background-color: rgba(255, 255, 255, 0.512);
+  border: none;
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(255, 119, 0, 0.4);
+}
+
+.next-btn:active {
+  transform: scale(0.95);
+}
+
+/* next-btn2는 사용하지 않으므로 제거하거나 주석처리 */
+/*
 .next-btn2 {
   position: absolute;
   bottom: 50px;
   right: 24px;
-  width: 75px;       
+  width: 75px;
   height: 75px;
-  border-radius: 50%;   /* 원형 만들기 */
+  border-radius: 50%;
   background-color: rgba(255, 119, 0, 0.288);
   color: #f70;
   border: none;
-
   display: flex;
   justify-content: center;
   align-items: center;
-
   font-size: 30px;
   cursor: pointer;
   z-index: 2;
-
   font-weight: bold;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .next-btn2:hover {
   background-color: rgba(255, 255, 255, 0.512);
-  border:none;
+  border: none;
+}
+*/
+
+/* 애니메이션 키프레임들 */
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutToLeft {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    transform: translateX(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }

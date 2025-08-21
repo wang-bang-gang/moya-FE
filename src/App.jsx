@@ -10,6 +10,7 @@ import MapPage from './assets/pages/MapPage';
 import PlaceDetailPage from './assets/pages/PlaceDetailPage';
 
 import './styles/fonts.css' 
+import LoadingPage from './assets/pages/LoadingPage';
 
 function App() {
     function setScreenSize() {
@@ -34,6 +35,7 @@ function App() {
               <Route path="/" element={<Onboarding1 />} />
               <Route path="/Onboarding2" element={<Onboarding2 />} />
               <Route path="/LanguageSelect" element={<LanguageSelect />}/>
+              <Route path="/LoadingPage" element={<LoadingPage />}/>
               <Route path="/MapPage" element={<MapPage />}/>
               <Route path="/place/:id" element={<PlaceDetailPage />}/>
             </Routes>

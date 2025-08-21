@@ -1,7 +1,8 @@
-.languageSelect{
+.languageSelect {
   width: 100%;
   height: calc(var(--vh, 1vh) * 100);
-  background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),url('../images/LanguageSelect.png');
+  background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+    url("../images/LanguageSelect.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -12,7 +13,7 @@
   align-items: center;
   padding: 30px;
   box-sizing: border-box;
-  margin:0;
+  margin: 0;
   padding: 30px;
 }
 
@@ -28,7 +29,7 @@
   border-radius: 12px;
 }
 
-.languageSelect button{
+.languageSelect button {
   display: flex;
   align-items: center;
   justify-content: start;
@@ -43,7 +44,6 @@ img {
   width: 30px;
   height: 30px;
   margin: 0px 65px 0px 0px;
-  
 }
 
 .O-of-MOYA {
@@ -51,37 +51,169 @@ img {
 }
 
 .moya-logo {
-    width: 100%;
-    font-size: 30px;
-    text-align: center;
-    font-family: 'RiaSans-ExtraBold', sans-serif;
-    font-size: 40px;
-    color: #fff;
-    margin: 0 0 10px 0;
-
+  width: 100%;
+  font-size: 30px;
+  text-align: center;
+  font-family: "RiaSans-ExtraBold", sans-serif;
+  font-size: 40px;
+  color: #fff;
+  margin: 0 0 10px 0;
 }
 
-
-.languageSelect p.describe{
+.languageSelect p.describe {
   margin: 0;
   margin-bottom: 30px;
   color: white;
-  font-family: 'PretendardVariable', sans-serif;
+  font-family: "PretendardVariable", sans-serif;
   font-weight: normal;
 }
 
 .copyright {
   font-size: 10px;
   color: white;
-  font-family: 'PretendardVariable', sans-serif;
+  font-family: "PretendardVariable", sans-serif;
 }
 
 .languageSelect button:hover {
   background-color: #f70;
-  border:none;
+  border: none;
 }
 
 .languageSelect button:active {
   background-color: #f70;
-  border:none;
+  border: none;
+}
+
+/* 기존 LanguageSelect.css 스타일들 유지하고 맨 아래에 추가 */
+
+.languageSelect {
+  /* 기존 스타일들... */
+  animation: slideInFromRight 0.5s ease-out;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.languageSelect.slide-out {
+  animation: slideOutToLeft 0.5s ease-in forwards;
+}
+
+/* 버튼들 부드러운 애니메이션 강화 */
+.languageSelect button {
+  /* 기존 스타일들... */
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  border-radius: 8px;
+}
+
+.languageSelect button:hover {
+  background-color: #f70;
+  border: none;
+  transform: translateX(5px);
+  box-shadow: 0 4px 15px rgba(255, 119, 0, 0.3);
+}
+
+.languageSelect button:active {
+  background-color: #f70;
+  border: none;
+  transform: scale(0.98);
+}
+
+/* 선택 박스 등장 애니메이션 */
+.selection-box {
+  /* 기존 스타일들... */
+  animation: fadeInUp 0.6s ease-out 0.2s both;
+}
+
+/* 로고 등장 애니메이션 */
+.moya-logo {
+  /* 기존 스타일들... */
+  animation: fadeInDown 0.6s ease-out both;
+}
+
+/* 설명 텍스트 등장 애니메이션 */
+.languageSelect p.describe {
+  /* 기존 스타일들... */
+  animation: fadeInUp 0.6s ease-out 0.1s both;
+}
+
+/* 버튼들 순차적 등장 애니메이션 */
+.selection-box button:nth-child(1) {
+  animation: slideInButton 0.5s ease-out 0.3s both;
+}
+
+.selection-box button:nth-child(2) {
+  animation: slideInButton 0.5s ease-out 0.4s both;
+}
+
+.selection-box button:nth-child(3) {
+  animation: slideInButton 0.5s ease-out 0.5s both;
+}
+
+.selection-box button:nth-child(4) {
+  animation: slideInButton 0.5s ease-out 0.6s both;
+}
+
+/* 플래그 이미지 호버 애니메이션 */
+.languageSelect button img {
+  transition: transform 0.3s ease;
+}
+
+.languageSelect button:hover img {
+  transform: scale(1.1) rotate(5deg);
+}
+
+/* 애니메이션 키프레임들 */
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutToLeft {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInButton {
+  from {
+    transform: translateX(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
