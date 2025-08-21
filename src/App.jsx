@@ -25,7 +25,7 @@ function App() {
   return (
     <LanguageProvider>
       <LoadScript 
-        googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
+        googleMapsApiKey={"AIzaSyD59dMKSMMJA-ZFqDzl6wXuY3qDz9vOu_w"}
         preventGoogleFontsLoading={true}
       >
         <Router>
