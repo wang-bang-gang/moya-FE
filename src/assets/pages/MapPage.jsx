@@ -652,8 +652,16 @@ const handleAudioPreview = async (place) => {
             likes={p.likes}
             imageUrl={p.thumb}
             onClick={() => {
+
+
               console.log("상세페이지 이동:", p.nameEn);
-              navigate(`/place/${p.id}`);
+              // place 데이터를 state로 함께 전달
+              navigate(`/place/${p.id}`, { 
+                state: { 
+                  placeData: p,
+                  fromMap: true 
+                } 
+              });
             }}
             onPreviewClick={() => handleAudioPreview(p)}
             isPlaying={playingPlaceId === p.id}
