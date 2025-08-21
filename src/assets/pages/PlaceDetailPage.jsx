@@ -1,12 +1,13 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useLanguage } from "../../contexts/LanguageContext";
 import "./PlaceDetailPage.css";
 
 export default function PlaceDetailPage() {
   const navigate = useNavigate();
-  const { id } = useParams(); // URL에서 place ID 추출
-  const { locale} = useLanguage();
+  const { id } = useParams();
+  const location = useLocation(); // state 데이터 받기 위해 추가
+  const { locale } = useLanguage();
   const audioRef = useRef(null);
   
   // API 상태 관리
@@ -22,20 +23,113 @@ export default function PlaceDetailPage() {
   const [likes, setLikes] = useState(0);
   const [showFullScript, setShowFullScript] = useState(false);
 
-  // 백엔드에서 장소 상세 정보 가져오기
+  // MapPage에서 전달받은 데이터가 있는지 확인
   useEffect(() => {
-    const fetchPlaceDetail = async () => {
+    const passedPlaceData = location.state?.placeData;
+    
+    if (passedPlaceData && location.state?.fromMap) {
+      console.log('MapPage에서 전달받은 데이터 사용:', passedPlaceData);
+      
+      // MapPage 데이터를 PlaceDetailPage 형식으로 변환
+      const transformedData = {
+        id: passedPlaceData.id,
+        name: passedPlaceData.nameEn || passedPlaceData.place_name,
+        image: passedPlaceData.thumb || passedPlaceData.image || "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=2340&q=80",
+        hours: passedPlaceData.business_hours || "정보 없음",
+        likes: passedPlaceData.likes || passedPlaceData.like || 0,
+        description: passedPlaceData.place_description || "설명이 없습니다.",
+        audioFullUrl: passedPlaceData.audio_full_key || passedPlaceData.audio_preview_key,
+        audioDuration: passedPlaceData.audio_duration || 180
+      };
+      
+      setPlaceData(transformedData);
+      setLikes(transformedData.likes);
+      setLoading(false);
+      
+      // 필요하다면 추가 상세 정보만 별도로 호출
+      const placeNo = passedPlaceData.place_no || (passedPlaceData.id ? passedPlaceData.id.replace('place_', '') : null);
+      if (placeNo) {
+        fetchAdditionalDetailData(placeNo);
+      }
+      
+    } else {
+      // 전달받은 데이터가 없으면 기존 API 호출 방식 사용
+      fetchPlaceDetail();
+    }
+  }, [id, locale, location.state]);
+
+  // 추가 상세 정보만 가져오는 함수 (선택적)
+  const fetchAdditionalDetailData = async (placeNo) => {
+    try {
+      console.log('추가 상세 정보 요청:', placeNo);
+      
+      const response = await fetch(
+        `https://d3e5n07qpnkfk8.cloudfront.net/api/places/${placeNo}/detail`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+
+      if (response.ok) {
+        const detailData = await response.json();
+        console.log('추가 상세 정보:', detailData);
+        
+        // 기존 데이터에 상세 정보 추가/업데이트
+        setPlaceData(prev => ({
+          ...prev,
+          hours: detailData.businessHours || prev.hours,
+          description: detailData.description || prev.description,
+          audioFullUrl: detailData.audioFullUrl || prev.audioFullUrl,
+          audioDuration: detailData.audioDuration || prev.audioDuration
+        }));
+      }
+    } catch (error) {
+      console.warn('추가 상세 정보 로드 실패:', error);
+      // 에러가 발생해도 기존 데이터로 계속 진행
+    }
+  };
+
+  // API 호출 함수 (직접 접근시에만 사용)
+  const fetchPlaceDetail = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const placeNo = id.startsWith('place_') ? id.replace('place_', '') : id;
+      console.log('API로 장소 정보 요청:', placeNo);
+      
+      // 1. nearby API에서 기본 정보 가져오기
+      let nearbyPlaceData = null;
       try {
-        setLoading(true);
-        setError(null);
-        
-        // URL에서 추출한 id가 "place_123" 형태면 숫자만 추출
-        const placeNo = id.startsWith('place_') ? id.replace('place_', '') : id;
-        
-        console.log('장소 상세 정보 요청:', placeNo);
-        
-        // 실제 API 엔드포인트 호출
-        const response = await fetch(
+        const nearbyResponse = await fetch(
+          `https://d3e5n07qpnkfk8.cloudfront.net/api/places/nearby?lat=33.4996&lng=126.5312&locale=${locale}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          }
+        );
+
+        if (nearbyResponse.ok) {
+          const nearbyData = await nearbyResponse.json();
+          console.log('nearby API 응답:', nearbyData);
+          
+          // 해당 place_no와 일치하는 데이터 찾기
+          nearbyPlaceData = nearbyData.find(place => place.id === parseInt(placeNo));
+          console.log('매칭된 nearby 데이터:', nearbyPlaceData);
+        }
+      } catch (nearbyError) {
+        console.warn('nearby API 호출 실패:', nearbyError);
+      }
+
+      // 2. detail API에서 상세 정보 가져오기
+      let detailData = null;
+      try {
+        const detailResponse = await fetch(
           `https://d3e5n07qpnkfk8.cloudfront.net/api/places/${placeNo}/detail`,
           {
             method: 'GET',
@@ -45,49 +139,45 @@ export default function PlaceDetailPage() {
           }
         );
 
-        if (!response.ok) {
-          // CORS 에러나 404 등의 경우 더미 데이터로 폴백
-          throw new Error(`HTTP error! status: ${response.status}`);
+        if (detailResponse.ok) {
+          detailData = await detailResponse.json();
+          console.log('detail API 응답:', detailData);
         }
-
-        const data = await response.json();
-        console.log('장소 상세 정보 응답:', data);
-        
-        // API 응답 데이터 설정
-        setPlaceData({
-          id: id,
-          name: data.name || "Unknown Place",
-          image: data.imageUrl || "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=2340&q=80",
-          hours: data.businessHours || "정보 없음",
-          likes: data.likeCount || 0,
-          description: data.description || "설명이 없습니다.",
-          audioFullUrl: data.audioFullUrl,
-          audioDuration: data.audioDuration || 180
-        });
-        
-        setLikes(data.likeCount || 0);
-        
-      } catch (error) {
-        console.error('장소 상세 정보 로드 실패:', error);
-        
-        // CORS 에러나 API 실패시 더미 데이터로 폴백
-        console.log('더미 데이터로 대체합니다.');
-        
-        const dummyData = getDummyPlaceData(id, locale);
-        setPlaceData(dummyData);
-        setLikes(dummyData.likes);
-        
-        // 에러는 설정하지 않고 더미 데이터로 계속 진행
-        // setError(error.message);
-      } finally {
-        setLoading(false);
+      } catch (detailError) {
+        console.warn('detail API 호출 실패:', detailError);
       }
-    };
 
-    if (id) {
-      fetchPlaceDetail();
+      // 3. 데이터 조합
+      if (nearbyPlaceData || detailData) {
+        const combinedData = {
+          id: id,
+          name: nearbyPlaceData?.name || detailData?.name || "Unknown Place",
+          image: nearbyPlaceData?.imageUrl || detailData?.imageUrl || "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=2340&q=80",
+          hours: detailData?.businessHours || "정보 없음",
+          likes: nearbyPlaceData?.likeCount || detailData?.likeCount || 0,
+          description: nearbyPlaceData?.description || detailData?.description || "설명이 없습니다.",
+          audioFullUrl: detailData?.audioFullUrl || nearbyPlaceData?.audioPreviewKey,
+          audioDuration: detailData?.audioDuration || 180
+        };
+
+        console.log('조합된 최종 데이터:', combinedData);
+        setPlaceData(combinedData);
+        setLikes(combinedData.likes);
+      } else {
+        throw new Error('API에서 데이터를 가져올 수 없습니다.');
+      }
+      
+    } catch (error) {
+      console.error('장소 정보 로드 실패:', error);
+      console.log('더미 데이터로 대체합니다.');
+      
+      const dummyData = getDummyPlaceData(id, locale);
+      setPlaceData(dummyData);
+      setLikes(dummyData.likes);
+    } finally {
+      setLoading(false);
     }
-  }, [id, locale]);
+  };
 
   // 더미 데이터 생성 함수 (API 실패시 폴백용)
   const getDummyPlaceData = (placeId, currentLocale) => {
