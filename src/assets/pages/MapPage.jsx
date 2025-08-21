@@ -35,7 +35,7 @@ function distanceMeters(a, b) {
 
 function formatDistance(km) {
   if (km == null) return "";
-  return `${km.toFixed(1)}km`;
+  return `${km.toFixed(1)}km`; // 백엔드에서 km로 주므로 그대로 km로 표시
 }
 
 // 마지막 위치 캐시 로드
@@ -61,7 +61,7 @@ async function fetchNearbyPlaces(lat, lng, locale = 'ko') {
 
   try {
     // 실제 백엔드 API 호출
-    const API_BASE_URL = "http://54.180.86.248:8080/";
+    const API_BASE_URL = "https://dhk1izcva0sot.cloudfront.net/";
     const queryParams = new URLSearchParams({
       lat: lat.toString(),
       lng: lng.toString(),
@@ -84,6 +84,11 @@ async function fetchNearbyPlaces(lat, lng, locale = 'ko') {
     const data = await response.json();
     console.log('백엔드 응답 데이터:', data);
 
+    // 응답이 배열인지 확인
+    if (!Array.isArray(data)) {
+      throw new Error('백엔드 응답이 배열이 아닙니다');
+    }
+
     // 백엔드 응답을 기존 형식에 맞게 변환
     const transformedData = data.map((p) => ({
       // 백엔드 응답 필드 매핑
@@ -92,20 +97,24 @@ async function fetchNearbyPlaces(lat, lng, locale = 'ko') {
       lng: p.lng,
       like: p.likeCount,
       business_hours: "정보 없음", // 백엔드에서 제공하지 않는 경우
-      image: p.imageUrl,
-      place_name: p.name, // 이미 locale에 맞는 이름
-      place_description: p.description, // 이미 locale에 맞는 설명
-      audio_preview_key: p.audioPreviewKey,
+      image: p.imageUrl || "", // null일 수 있으므로 기본값 설정
+      place_name: p.name,
+      place_description: p.description,
+      audio_preview_key: p.audioPreviewKey, // null 가능
       audio_full_key: p.audioPreviewKey, // 전체 버전이 따로 있다면 수정
       audio_duration: 180, // 기본값, 실제로는 백엔드에서 제공해야 함
+      published: p.published, // 백엔드 필드 추가
+      commentCount: p.commentCount, // 백엔드 필드 추가
       
       // 프론트엔드에서 사용하는 형식
       id: `place_${p.id}`,
       nameEn: p.name,
       likes: p.likeCount,
-      thumb: p.imageUrl,
-      distanceM: p.distance, // 백엔드에서 km로 주므로 그대로 사용 (formatDistance에서 km로 표시)
+      thumb: p.imageUrl || "", // null일 수 있으므로 기본값 설정
+      distanceM: p.distance, // 백엔드에서 km로 주므로 그대로 사용
     }));
+
+    console.log('변환된 데이터:', transformedData);
 
     // 백엔드에서 이미 거리순으로 정렬해서 보내주므로 추가 정렬 불필요
     return transformedData;
@@ -288,37 +297,83 @@ export default function MapPage() {
     }
   }, [isGoogleReady]);
 
-  // 내 위치 가져오기(한 번 + watch) & 캐시
+  // 내 위치 가져오기 - 거리 기반 업데이트
   useEffect(() => {
     if (!("geolocation" in navigator)) return;
     
-    navigator.geolocation.getCurrentPosition(
-      ({ coords }) => {
-        const pos = { lat: coords.latitude, lng: coords.longitude };
-        setUserLocation(pos);
+    let lastSavedPosition = null; // 마지막으로 저장된 위치
+    
+    // 거리 계산 함수 (km 단위)
+    const calculateDistance = (pos1, pos2) => {
+      if (!pos1 || !pos2) return 0;
+      return distanceMeters(pos1, pos2) / 1000; // km로 변환
+    };
+    
+    // 위치 업데이트 처리 함수
+    const handlePositionUpdate = (position) => {
+      const newPos = { 
+        lat: position.coords.latitude, 
+        lng: position.coords.longitude 
+      };
+      
+      // 첫 번째 위치이거나, 100m 이상 이동했을 때만 업데이트
+      if (!lastSavedPosition) {
+        // 첫 번째 위치
+        console.log('첫 번째 위치 설정:', newPos);
+        setUserLocation(newPos);
+        lastSavedPosition = newPos;
+        
         try { 
-          localStorage.setItem("MY_POS", JSON.stringify(pos)); 
+          localStorage.setItem("MY_POS", JSON.stringify(newPos)); 
         } catch (error) {
           console.warn("Failed to save position:", error);
         }
+      } else {
+        // 거리 계산
+        const distance = calculateDistance(lastSavedPosition, newPos);
+        console.log(`위치 변화 감지: ${distance.toFixed(3)}km`);
+        
+        if (distance >= 0.1) { // 100m 이상 이동
+          console.log('100m 이상 이동 - 위치 업데이트:', newPos);
+          setUserLocation(newPos);
+          lastSavedPosition = newPos;
+          
+          try { 
+            localStorage.setItem("MY_POS", JSON.stringify(newPos)); 
+          } catch (error) {
+            console.warn("Failed to save position:", error);
+          }
+        } else {
+          console.log('100m 미만 이동 - 위치 업데이트 스킵');
+        }
+      }
+    };
+    
+    // 초기 위치 가져오기
+    navigator.geolocation.getCurrentPosition(
+      handlePositionUpdate,
+      (error) => {
+        console.error('위치 정보를 가져올 수 없습니다:', error);
       },
-      () => {},
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 60_000 }
     );
     
-    const id = navigator.geolocation.watchPosition(
-      ({ coords }) => {
-        const pos = { lat: coords.latitude, lng: coords.longitude };
-        setUserLocation(pos);
-        try { 
-          localStorage.setItem("MY_POS", JSON.stringify(pos)); 
-        } catch (error) {
-          console.warn("Failed to save position:", error);
-        }
+    // 위치 변화 감시 (거리 기반 필터링 적용)
+    const watchId = navigator.geolocation.watchPosition(
+      handlePositionUpdate,
+      (error) => {
+        console.warn('위치 감시 오류:', error);
+      },
+      { 
+        enableHighAccuracy: true, 
+        timeout: 15000, 
+        maximumAge: 30_000 // 30초간 캐시 사용
       }
     );
     
-    return () => navigator.geolocation.clearWatch(id);
+    return () => {
+      navigator.geolocation.clearWatch(watchId);
+    };
   }, []);
 
   // API 호출 (locale 변경 시에도 다시 호출)
