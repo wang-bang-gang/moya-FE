@@ -631,6 +631,12 @@ const handleAudioPreview = async (place) => {
         >
           <i className="fa-solid fa-location-arrow"></i>
         </button>
+        <button 
+          className="languageBtn"
+          onClick={() => navigate("/LanguageSelect")}
+        >
+          <i className="fa-solid fa-globe"></i>
+        </button>
       </div>
 
       <BottomSheet
