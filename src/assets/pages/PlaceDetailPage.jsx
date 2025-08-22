@@ -427,55 +427,15 @@ export default function PlaceDetailPage() {
   };
 
   // 좋아요 토글 (API 호출)
-  const handleLikeToggle = async () => {
-    try {
-      const newLikedState = !isLiked;
-      const action = newLikedState ? 'like' : 'unlike';
-      
-      // 즉시 UI 업데이트 (Optimistic Update)
-      setIsLiked(newLikedState);
-      setLikes(prev => newLikedState ? prev + 1 : prev - 1);
-      
-      // 실제 API 호출
-      const placeNo = id.startsWith('place_') ? id.replace('place_', '') : id;
-      
-      const response = await fetch(
-        `${API_BASE_URL}/api/places/${placeNo}/like`, 
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            action: action,
-            place_no: placeNo
-          })
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
-      
-      // 서버에서 받은 실제 좋아요 수로 업데이트
-      if (result.likes !== undefined) {
-        setLikes(result.likes);
-      }
-      
-      console.log(`${action} 성공:`, result);
-      
-    } catch (error) {
-      console.error('좋아요 처리 실패:', error);
-      
-      // 에러 발생시 UI 롤백
-      setIsLiked(!isLiked);
-      setLikes(prev => isLiked ? prev + 1 : prev - 1);
-      
-      alert(getLocalizedText('like_error', '좋아요 처리 중 오류가 발생했습니다. 다시 시도해주세요.'));
-    }
-  };
+  const handleLikeToggle = () => {
+  // 좋아요 상태만 토글
+  setIsLiked(!isLiked);
+  
+  // 좋아요 수 증감 (로컬 상태만)
+  setLikes(prev => isLiked ? prev - 1 : prev + 1);
+  
+  console.log(`좋아요 ${isLiked ? '취소' : '추가'}됨`);
+};
 
   // 시간 포맷팅
   const formatTime = (time) => {
